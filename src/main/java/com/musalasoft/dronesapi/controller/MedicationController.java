@@ -27,7 +27,11 @@ public class MedicationController {
     public static final String SUCCESS = "Success";
     private MedicationService medicationService;
 
-    // SAVING A MEDICATION
+    /**
+     * SAVING A MEDICATION
+     * @param requestDTO_saveMedication
+     * @return
+     */
     @PostMapping(path = "/save", consumes = "application/json", produces = "application/json")
     public ResponseEntity<APIResponse> saveMedication(
             @Valid @NotNull @RequestBody RequestDTO_SaveMedication requestDTO_saveMedication) {
@@ -47,7 +51,11 @@ public class MedicationController {
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
-    // SAVING MULTIPLE MEDICATION (LIST)
+    /**
+     * SAVING MULTIPLE MEDICATION (LIST)
+     * @param requestDTO_saveMedicationList
+     * @return
+     */
     @PostMapping(path = "/save_all", consumes = "application/json", produces = "application/json")
     public ResponseEntity<APIResponse> saveAllMedication(
             @Valid @NotNull @RequestBody List<RequestDTO_SaveMedication> requestDTO_saveMedicationList) {

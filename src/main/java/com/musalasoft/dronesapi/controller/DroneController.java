@@ -25,7 +25,11 @@ public class DroneController {
     public static final String SUCCESS = "Success";
     private DroneService droneService;
 
-    // REGISTERING A DRONE
+    /**
+     * REGISTERING A DRONE
+     * @param requestDTO_droneRegistration
+     * @return
+     */
     @PostMapping(path = "/register", consumes = "application/json", produces = "application/json")
     public ResponseEntity<APIResponse> registerDrone(
             @Valid @NotNull @RequestBody RequestDTO_DroneRegistration requestDTO_droneRegistration) {
@@ -44,7 +48,11 @@ public class DroneController {
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
-    // CHECKING AVAILABLE DRONES FOR LOADING
+    /**
+     * CHECKING AVAILABLE DRONES FOR LOADING
+     * @return
+     * @throws DroneServiceException
+     */
     @GetMapping(path = "/check_availability", produces = "application/json")
     public ResponseEntity<APIResponse> checkAvailableDronesForLoading() throws DroneServiceException {
         log.info("DroneController::checkAvailableDronesForLoading request body");
@@ -62,7 +70,12 @@ public class DroneController {
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
-    // CHECK DRONE BATTERY LEVEL FOR A GIVEN DRONE
+    /**
+     * CHECK DRONE BATTERY LEVEL FOR A GIVEN DRONE
+     * @param serialNumber
+     * @return
+     * @throws DroneServiceException
+     */
     @GetMapping(path = "/check_battery_level/{serialNumber}", produces = "application/json")
     public ResponseEntity<APIResponse> checkBatteryLevel(@PathVariable("serialNumber") String serialNumber) throws DroneServiceException {
         log.info("DispatchController::checkBatteryLevel request body {}", serialNumber);

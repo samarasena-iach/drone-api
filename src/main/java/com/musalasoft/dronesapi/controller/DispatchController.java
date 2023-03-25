@@ -24,7 +24,12 @@ public class DispatchController {
     public static final String SUCCESS = "Success";
     private DispatchService dispatchService;
 
-    // LOADING A DRONE WITH MEDICATION ITEMS
+    /**
+     * LOADING A DRONE WITH MEDICATION ITEMS
+     * @param requestDTO_loadDroneWithMedications
+     * @return
+     * @throws DispatchServiceException
+     */
     @PostMapping(path = "/load_medications", consumes = "application/json", produces = "application/json")
     public ResponseEntity<APIResponse> loadDroneWithMedications(@Valid @NotNull @RequestBody RequestDTO_LoadDroneWithMedications requestDTO_loadDroneWithMedications) throws DispatchServiceException {
         log.info("DispatchController::loadDroneWithMedications request body {}", requestDTO_loadDroneWithMedications);
@@ -42,7 +47,12 @@ public class DispatchController {
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
-    // CHECKING LOADED MEDICATION ITEMS FOR A GIVEN DRONE
+    /**
+     * CHECKING LOADED MEDICATION ITEMS FOR A GIVEN DRONE
+     * @param serialNumber
+     * @return
+     * @throws DispatchServiceException
+     */
     @GetMapping(path = "/check_medications/{serialNumber}", produces = "application/json")
     public ResponseEntity<APIResponse> checkLoadedMedications(@PathVariable("serialNumber") String serialNumber) throws DispatchServiceException {
         log.info("DispatchController::checkLoadedMedications request body {}", serialNumber);

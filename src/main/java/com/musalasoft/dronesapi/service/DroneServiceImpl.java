@@ -59,7 +59,6 @@ public class DroneServiceImpl implements DroneService {
     public ResponseDTO_CheckAvailableDronesForLoading checkAvailableDronesForLoading() throws DroneServiceException {
         try {
             log.info("DroneService::checkAvailableDronesForLoading execution started.");
-            log.debug("DroneService::checkAvailableDronesForLoading request parameters");
 
             List<Drone> listOfIdleDrones = droneRepository.findAllByState(Constant.IDLE);
 
