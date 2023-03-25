@@ -14,6 +14,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Drone {
 
+    // For a list of Drones (As dummy data)
+    // https://www.pcmag.com/picks/the-best-drones
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

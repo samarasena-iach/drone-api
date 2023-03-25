@@ -1,12 +1,19 @@
 package com.musalasoft.dronesapi.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "medication")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Medication {
+
+    // For a list of Medications (As dummy data)
+    // https://www.fda.gov/drugs/new-drugs-fda-cders-new-molecular-entities-and-new-therapeutic-biological-products/novel-drug-approvals-2022
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,13 +22,11 @@ public class Medication {
     @Column(name = "name")
     private String name;
 
-    @Min(1)
-    @Max(500)
-    @Column(name = "weight")
-    private double weight;
-
     @Column(name = "code")
     private String code;
+
+    @Column(name = "weight")
+    private double weight;
 
     @Column(name = "image")
     private String image;

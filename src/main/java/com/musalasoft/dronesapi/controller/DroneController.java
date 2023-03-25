@@ -16,24 +16,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/drone")
+@RequestMapping("/api/v1/drones")
 @AllArgsConstructor
 @Slf4j
 public class DroneController {
     public static final String SUCCESS = "Success";
     private DroneService droneService;
 
-    // REGISTERING A DRONE;
+    // REGISTERING A DRONE
     @PostMapping(path = "/register", consumes = "application/json", produces = "application/json")
     public ResponseEntity<APIResponse> registerDrone(
             @Valid @NotNull @RequestBody RequestDTO_DroneRegistration requestDTO_droneRegistration) {
         log.info("DroneController::registerDrone request body {}", requestDTO_droneRegistration);
 
-        ResponseDTO_DroneRegistration responseDTO_droneRegistration = droneService.register(requestDTO_droneRegistration);
+        ResponseDTO_DroneRegistration responseDTO_droneRegistration = droneService.registerDrone(requestDTO_droneRegistration);
 
         APIResponse<ResponseDTO_DroneRegistration> responseDTO = APIResponse.<ResponseDTO_DroneRegistration>builder()
                 .status(SUCCESS)
-                .message("New Drone created successfully!")
+                .message("SUCCESSFULLY REGISTERED DRONE!")
                 .results(responseDTO_droneRegistration)
                 .timestamp(java.time.LocalDateTime.now())
                 .build();
@@ -43,8 +43,6 @@ public class DroneController {
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
-    // LOADING A DRONE WITH MEDICATION ITEMS
-    // CHECKING LOADED MEDICATION ITEMS FOR A GIVEN DRONE
     // CHECKING AVAILABLE DRONES FOR LOADING
     // CHECK DRONE BATTERY LEVEL FOR A GIVEN DRONE
 }
