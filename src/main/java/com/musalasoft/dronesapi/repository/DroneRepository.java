@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Transactional
 public interface DroneRepository extends JpaRepository<Drone, Long> {
 
@@ -15,5 +17,7 @@ public interface DroneRepository extends JpaRepository<Drone, Long> {
     @Modifying
     @Query(value = "UPDATE Drone d SET d.state = :state WHERE d.serialNumber = :serialNumber")
     void updateDroneState(@Param("state") String state, @Param("serialNumber") String serialNumber);
+
+    List<Drone> findAllByState(String state);
 
 }

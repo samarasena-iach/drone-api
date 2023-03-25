@@ -3,7 +3,6 @@ package com.musalasoft.dronesapi.controller;
 import com.musalasoft.dronesapi.dto.APIResponse;
 import com.musalasoft.dronesapi.dto.request.RequestDTO_LoadDroneWithMedications;
 import com.musalasoft.dronesapi.dto.response.ResponseDTO_CheckLoadedMedications;
-import com.musalasoft.dronesapi.dto.response.ResponseDTO_DroneRegistration;
 import com.musalasoft.dronesapi.dto.response.ResponseDTO_LoadDroneWithMedications;
 import com.musalasoft.dronesapi.exception.DispatchServiceException;
 import com.musalasoft.dronesapi.service.DispatchService;
@@ -14,8 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/dispatch")

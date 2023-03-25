@@ -2,7 +2,9 @@ package com.musalasoft.dronesapi.controller;
 
 import com.musalasoft.dronesapi.dto.APIResponse;
 import com.musalasoft.dronesapi.dto.request.RequestDTO_DroneRegistration;
+import com.musalasoft.dronesapi.dto.response.ResponseDTO_CheckAvailableDronesForLoading;
 import com.musalasoft.dronesapi.dto.response.ResponseDTO_DroneRegistration;
+import com.musalasoft.dronesapi.exception.DroneServiceException;
 import com.musalasoft.dronesapi.service.DroneService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -10,10 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/drones")
@@ -39,10 +38,26 @@ public class DroneController {
                 .build();
 
         log.info("DroneController::registerDrone response {}", responseDTO);
-
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
     // CHECKING AVAILABLE DRONES FOR LOADING
+    @GetMapping(path = "/check_availability", produces = "application/json")
+    public ResponseEntity<APIResponse> checkAvailableDronesForLoading() throws DroneServiceException {
+        log.info("DroneController::checkAvailableDronesForLoading request body");
+
+        ResponseDTO_CheckAvailableDronesForLoading responseDTO_checkAvailableDronesForLoading = droneService.checkAvailableDronesForLoading();
+
+        APIResponse<ResponseDTO_CheckAvailableDronesForLoading> responseDTO = APIResponse.<ResponseDTO_CheckAvailableDronesForLoading>builder()
+                .status(SUCCESS)
+                .message("SUCCESSFULLY RETRIEVED LIST OF DRONES AVAILABLE FOR LOADING!")
+                .results(responseDTO_checkAvailableDronesForLoading)
+                .timestamp(java.time.LocalDateTime.now())
+                .build();
+
+        log.info("DroneController::registerDrone response {}", responseDTO);
+        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+    }
+
     // CHECK DRONE BATTERY LEVEL FOR A GIVEN DRONE
 }

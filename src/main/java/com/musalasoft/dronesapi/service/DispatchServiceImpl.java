@@ -15,8 +15,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -75,13 +73,13 @@ public class DispatchServiceImpl implements DispatchService {
                 // UPDATING DRONE STATE FROM 'LOADING' TO 'LOADED'
                 droneRepository.updateDroneState("LOADED", drone.getSerialNumber());
 
-                ResponseDTO_LoadDroneWithMedications medicationDeliveryResponse = new ResponseDTO_LoadDroneWithMedications();
-                medicationDeliveryResponse.setId(newMedicationDelivery.getId());
-                medicationDeliveryResponse.setSerialNumber(newMedicationDelivery.getDrone().getSerialNumber());
-                medicationDeliveryResponse.setCode(newMedicationDelivery.getMedication().getCode());
+                ResponseDTO_LoadDroneWithMedications responseDTO_loadDroneWithMedications = new ResponseDTO_LoadDroneWithMedications();
+                responseDTO_loadDroneWithMedications.setId(newMedicationDelivery.getId());
+                responseDTO_loadDroneWithMedications.setSerialNumber(newMedicationDelivery.getDrone().getSerialNumber());
+                responseDTO_loadDroneWithMedications.setCode(newMedicationDelivery.getMedication().getCode());
 
                 log.info("DispatchService::loadDroneWithMedications execution ended");
-                return medicationDeliveryResponse;
+                return responseDTO_loadDroneWithMedications;
             }
         } catch (Exception ex) {
             log.error("DispatchService::loadDroneWithMedications exception {}", ex.getMessage());
@@ -111,12 +109,12 @@ public class DispatchServiceImpl implements DispatchService {
 
             List<Medication> medicationList = alreadyExistingMedicationsInDrone.stream().map(MedicationDelivery::getMedication).collect(Collectors.toList());
 
-            ResponseDTO_CheckLoadedMedications medicationDeliveryResponse = new ResponseDTO_CheckLoadedMedications();
-            medicationDeliveryResponse.setSerialNumber(drone.getSerialNumber());
-            medicationDeliveryResponse.setMedicationList(medicationList);
+            ResponseDTO_CheckLoadedMedications responseDTO_checkLoadedMedications = new ResponseDTO_CheckLoadedMedications();
+            responseDTO_checkLoadedMedications.setSerialNumber(drone.getSerialNumber());
+            responseDTO_checkLoadedMedications.setMedicationList(medicationList);
 
             log.info("DispatchService::checkLoadedMedications execution ended");
-            return medicationDeliveryResponse;
+            return responseDTO_checkLoadedMedications;
         } catch (Exception ex) {
             log.error("DispatchService::checkLoadedMedications exception {}", ex.getMessage());
             ex.printStackTrace();
