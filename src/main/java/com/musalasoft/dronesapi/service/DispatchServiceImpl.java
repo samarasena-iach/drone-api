@@ -1,6 +1,7 @@
 package com.musalasoft.dronesapi.service;
 
 import com.musalasoft.dronesapi.dto.request.RequestDTO_LoadDroneWithMedications;
+import com.musalasoft.dronesapi.dto.response.ResponseDTO_CheckLoadedMedications;
 import com.musalasoft.dronesapi.dto.response.ResponseDTO_LoadDroneWithMedications;
 import com.musalasoft.dronesapi.exception.DispatchServiceException;
 import com.musalasoft.dronesapi.model.Drone;
@@ -14,7 +15,10 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -85,6 +89,40 @@ public class DispatchServiceImpl implements DispatchService {
         }
 
         log.info("DispatchService::loadDroneWithMedications execution ended with null return");
+        return null;
+    }
+
+    @Override
+    public ResponseDTO_CheckLoadedMedications checkLoadedMedications(String serialNumber) throws DispatchServiceException {
+        try {
+            log.info("DispatchService::checkLoadedMedications execution started.");
+            log.debug("DispatchService::checkLoadedMedications request parameters {}", serialNumber);
+
+            Drone drone = droneRepository.findBySerialNumber(serialNumber);
+            if (drone == null) {
+                throw new DispatchServiceException("NO EXISTING DRONE FOR SERIAL NUMBER [" + serialNumber + "]");
+            }
+
+            List<MedicationDelivery> alreadyExistingMedicationsInDrone = medicationDeliveryRepository.findAllByDrone(drone);
+
+            if (alreadyExistingMedicationsInDrone.isEmpty()) {
+                throw new DispatchServiceException("NO MEDICATION ARE LOADED ON DRONE [" + serialNumber + "]");
+            }
+
+            List<Medication> medicationList = alreadyExistingMedicationsInDrone.stream().map(MedicationDelivery::getMedication).collect(Collectors.toList());
+
+            ResponseDTO_CheckLoadedMedications medicationDeliveryResponse = new ResponseDTO_CheckLoadedMedications();
+            medicationDeliveryResponse.setSerialNumber(drone.getSerialNumber());
+            medicationDeliveryResponse.setMedicationList(medicationList);
+
+            log.info("DispatchService::checkLoadedMedications execution ended");
+            return medicationDeliveryResponse;
+        } catch (Exception ex) {
+            log.error("DispatchService::checkLoadedMedications exception {}", ex.getMessage());
+            ex.printStackTrace();
+        }
+
+        log.info("DispatchService::checkLoadedMedications execution ended with null return");
         return null;
     }
 

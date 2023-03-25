@@ -2,6 +2,7 @@ package com.musalasoft.dronesapi.controller;
 
 import com.musalasoft.dronesapi.dto.APIResponse;
 import com.musalasoft.dronesapi.dto.request.RequestDTO_LoadDroneWithMedications;
+import com.musalasoft.dronesapi.dto.response.ResponseDTO_CheckLoadedMedications;
 import com.musalasoft.dronesapi.dto.response.ResponseDTO_DroneRegistration;
 import com.musalasoft.dronesapi.dto.response.ResponseDTO_LoadDroneWithMedications;
 import com.musalasoft.dronesapi.exception.DispatchServiceException;
@@ -12,10 +13,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/dispatch")
@@ -40,10 +40,24 @@ public class DispatchController {
                 .build();
 
         log.info("DispatchController::loadDroneWithMedications response {}", responseDTO);
-
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
     // CHECKING LOADED MEDICATION ITEMS FOR A GIVEN DRONE
+    @GetMapping(path = "/check_medications/{serialNumber}", produces = "application/json")
+    public ResponseEntity<APIResponse> checkLoadedMedications(@PathVariable("serialNumber") String serialNumber) throws DispatchServiceException {
+        log.info("DispatchController::checkLoadedMedications request body {}", serialNumber);
 
+        ResponseDTO_CheckLoadedMedications responseDTO_checkLoadedMedications = dispatchService.checkLoadedMedications(serialNumber);
+
+        APIResponse<ResponseDTO_CheckLoadedMedications> responseDTO = APIResponse.<ResponseDTO_CheckLoadedMedications>builder()
+                .status(SUCCESS)
+                .message("SUCCESSFULLY RETRIEVED LIST OF MEDICATIONS LOADED IN DRONE [" + serialNumber + "]")
+                .results(responseDTO_checkLoadedMedications)
+                .timestamp(java.time.LocalDateTime.now())
+                .build();
+
+        log.info("DispatchController::checkLoadedMedications response {}", responseDTO);
+        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+    }
 }
