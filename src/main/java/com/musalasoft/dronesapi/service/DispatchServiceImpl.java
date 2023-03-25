@@ -62,7 +62,7 @@ public class DispatchServiceImpl implements DispatchService {
 
             if (!isDroneWeightLimitExceeded) {
                 // UPDATING DRONE STATE FROM 'IDLE' TO 'LOADING'
-                droneRepository.updateDroneState("LOADING", requestDTO_loadDroneWithMedications.getSerialNumber());
+                droneRepository.updateDroneState(Constant.LOADING, requestDTO_loadDroneWithMedications.getSerialNumber());
 
                 MedicationDelivery medicationDelivery = new MedicationDelivery();
                 medicationDelivery.setDrone(drone);
@@ -71,7 +71,7 @@ public class DispatchServiceImpl implements DispatchService {
                 MedicationDelivery newMedicationDelivery = medicationDeliveryRepository.save(medicationDelivery);
 
                 // UPDATING DRONE STATE FROM 'LOADING' TO 'LOADED'
-                droneRepository.updateDroneState("LOADED", drone.getSerialNumber());
+                droneRepository.updateDroneState(Constant.LOADED, drone.getSerialNumber());
 
                 ResponseDTO_LoadDroneWithMedications responseDTO_loadDroneWithMedications = new ResponseDTO_LoadDroneWithMedications();
                 responseDTO_loadDroneWithMedications.setId(newMedicationDelivery.getId());

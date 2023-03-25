@@ -2,8 +2,8 @@ package com.musalasoft.dronesapi.service;
 
 import com.musalasoft.dronesapi.dto.request.RequestDTO_DroneRegistration;
 import com.musalasoft.dronesapi.dto.response.ResponseDTO_CheckAvailableDronesForLoading;
+import com.musalasoft.dronesapi.dto.response.ResponseDTO_CheckBatteryLevel;
 import com.musalasoft.dronesapi.dto.response.ResponseDTO_DroneRegistration;
-import com.musalasoft.dronesapi.exception.DispatchServiceException;
 import com.musalasoft.dronesapi.exception.DroneServiceException;
 import com.musalasoft.dronesapi.model.Drone;
 import com.musalasoft.dronesapi.repository.DroneRepository;
@@ -56,7 +56,7 @@ public class DroneServiceImpl implements DroneService {
     }
 
     @Override
-    public ResponseDTO_CheckAvailableDronesForLoading checkAvailableDronesForLoading() throws DroneServiceException{
+    public ResponseDTO_CheckAvailableDronesForLoading checkAvailableDronesForLoading() throws DroneServiceException {
         try {
             log.info("DroneService::checkAvailableDronesForLoading execution started.");
             log.debug("DroneService::checkAvailableDronesForLoading request parameters");
@@ -78,6 +78,33 @@ public class DroneServiceImpl implements DroneService {
         }
 
         log.info("DroneService::checkAvailableDronesForLoading execution ended with null return");
+        return null;
+    }
+
+    @Override
+    public ResponseDTO_CheckBatteryLevel checkBatteryLevel(String serialNumber) throws DroneServiceException {
+        try {
+            log.info("DroneService::checkBatteryLevel execution started.");
+            log.debug("DroneService::checkBatteryLevel request parameters {}", serialNumber);
+
+            Drone drone = droneRepository.findBySerialNumber(serialNumber);
+            if (drone == null) {
+                throw new DroneServiceException("NO EXISTING DRONE FOR SERIAL NUMBER [" + serialNumber + "]");
+            }
+
+            ResponseDTO_CheckBatteryLevel responseDTO_checkBatteryLevel = new ResponseDTO_CheckBatteryLevel();
+            responseDTO_checkBatteryLevel.setSerialNumber(drone.getSerialNumber());
+            responseDTO_checkBatteryLevel.setModel(drone.getModel());
+            responseDTO_checkBatteryLevel.setBatteryCapacity(drone.getBatteryCapacity() + "%");
+
+            log.info("DroneService::checkBatteryLevel execution ended");
+            return responseDTO_checkBatteryLevel;
+        } catch (Exception ex) {
+            log.error("DroneService::checkBatteryLevel exception {}", ex.getMessage());
+            ex.printStackTrace();
+        }
+
+        log.info("DroneService::checkBatteryLevel execution ended with null return");
         return null;
     }
 }
