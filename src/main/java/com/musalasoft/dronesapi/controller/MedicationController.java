@@ -3,6 +3,7 @@ package com.musalasoft.dronesapi.controller;
 import com.musalasoft.dronesapi.dto.APIResponse;
 import com.musalasoft.dronesapi.dto.request.RequestDTO_SaveMedication;
 import com.musalasoft.dronesapi.dto.response.ResponseDTO_SaveMedication;
+import com.musalasoft.dronesapi.exception.MedicationServiceException;
 import com.musalasoft.dronesapi.service.MedicationService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -34,7 +35,7 @@ public class MedicationController {
      */
     @PostMapping(path = "/save", consumes = "application/json", produces = "application/json")
     public ResponseEntity<APIResponse> saveMedication(
-            @Valid @NotNull @RequestBody RequestDTO_SaveMedication requestDTO_saveMedication) {
+            @Valid @NotNull @RequestBody RequestDTO_SaveMedication requestDTO_saveMedication) throws MedicationServiceException {
         log.info("MedicationController::saveMedication request body {}", requestDTO_saveMedication);
 
         ResponseDTO_SaveMedication responseDTO_saveMedication = medicationService.saveMedication(requestDTO_saveMedication);
@@ -58,7 +59,7 @@ public class MedicationController {
      */
     @PostMapping(path = "/save_all", consumes = "application/json", produces = "application/json")
     public ResponseEntity<APIResponse> saveAllMedication(
-            @Valid @NotNull @RequestBody List<RequestDTO_SaveMedication> requestDTO_saveMedicationList) {
+            @Valid @NotNull @RequestBody List<RequestDTO_SaveMedication> requestDTO_saveMedicationList) throws MedicationServiceException{
         log.info("MedicationController::saveAllMedication request body {}", requestDTO_saveMedicationList);
 
         List<ResponseDTO_SaveMedication> responseDTO_saveMedicationList = medicationService.saveAllMedication(requestDTO_saveMedicationList);
