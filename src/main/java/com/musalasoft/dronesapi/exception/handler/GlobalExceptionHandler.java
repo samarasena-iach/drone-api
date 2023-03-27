@@ -4,8 +4,10 @@ import com.musalasoft.dronesapi.dto.APIResponse;
 import com.musalasoft.dronesapi.dto.ErrorDTO;
 import com.musalasoft.dronesapi.exception.DispatchServiceException;
 import com.musalasoft.dronesapi.exception.DroneServiceException;
+import com.musalasoft.dronesapi.exception.MedicationServiceException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
 import java.util.Collections;
 
 
@@ -21,6 +23,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = DroneServiceException.class)
     public APIResponse<?> handleServiceException(DroneServiceException exception) {
+        APIResponse<?> serviceResponse = new APIResponse<>();
+        serviceResponse.setStatus("FAILED");
+        serviceResponse.setErrors(Collections.singletonList(new ErrorDTO("", exception.getMessage())));
+        return serviceResponse;
+    }
+
+    @ExceptionHandler(value = MedicationServiceException.class)
+    public APIResponse<?> handleServiceException(MedicationServiceException exception) {
         APIResponse<?> serviceResponse = new APIResponse<>();
         serviceResponse.setStatus("FAILED");
         serviceResponse.setErrors(Collections.singletonList(new ErrorDTO("", exception.getMessage())));

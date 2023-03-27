@@ -22,88 +22,69 @@ public class DroneServiceImpl implements DroneService {
     private DroneRepository droneRepository;
 
     @Override
-    public ResponseDTO_DroneRegistration registerDrone(RequestDTO_DroneRegistration requestDTO_droneRegistration) {
-        try {
-            log.info("DroneService::registerDrone execution started.");
-            log.debug("DroneService::registerDrone request parameters {}", requestDTO_droneRegistration);
+    public ResponseDTO_DroneRegistration registerDrone(RequestDTO_DroneRegistration requestDTO_droneRegistration) throws DroneServiceException {
+        log.info("DroneService::registerDrone execution started.");
+        log.debug("DroneService::registerDrone request parameters {}", requestDTO_droneRegistration);
 
-            Drone drone = new Drone();
-            drone.setSerialNumber(requestDTO_droneRegistration.getSerialNumber());
-            drone.setModel(requestDTO_droneRegistration.getModel());
-            drone.setName(requestDTO_droneRegistration.getName());
-            drone.setWeightLimit(requestDTO_droneRegistration.getWeightLimit());
-            drone.setBatteryCapacity(requestDTO_droneRegistration.getBatteryCapacity());
-            drone.setState(requestDTO_droneRegistration.getState());
-            Drone newDrone = droneRepository.save(drone);
-
-            if (newDrone != null) {
-                ResponseDTO_DroneRegistration responseDTO_droneRegistration = new ResponseDTO_DroneRegistration();
-                responseDTO_droneRegistration.setId(newDrone.getId());
-                responseDTO_droneRegistration.setSerialNumber(newDrone.getSerialNumber());
-                responseDTO_droneRegistration.setModel(newDrone.getModel());
-                responseDTO_droneRegistration.setName(newDrone.getName());
-                responseDTO_droneRegistration.setWeightLimit(newDrone.getWeightLimit());
-                responseDTO_droneRegistration.setBatteryCapacity(newDrone.getBatteryCapacity());
-                responseDTO_droneRegistration.setState(newDrone.getState());
-                return responseDTO_droneRegistration;
-            }
-        } catch (Exception ex) {
-            log.error("DroneService::registerDrone exception {}", ex.getMessage());
+        if (droneRepository.findBySerialNumber(requestDTO_droneRegistration.getSerialNumber()) != null) {
+            throw new DroneServiceException("EXISTING DRONE FOUND FOR SERIAL NUMBER [" + requestDTO_droneRegistration.getSerialNumber() + "]");
         }
 
-        log.info("DroneService::registerDrone execution ended.");
-        return null;
+        Drone drone = new Drone();
+        drone.setSerialNumber(requestDTO_droneRegistration.getSerialNumber());
+        drone.setModel(requestDTO_droneRegistration.getModel());
+        drone.setName(requestDTO_droneRegistration.getName());
+        drone.setWeightLimit(requestDTO_droneRegistration.getWeightLimit());
+        drone.setBatteryCapacity(requestDTO_droneRegistration.getBatteryCapacity());
+        drone.setState(requestDTO_droneRegistration.getState());
+        Drone newDrone = droneRepository.save(drone);
+
+        ResponseDTO_DroneRegistration responseDTO_droneRegistration = new ResponseDTO_DroneRegistration();
+        responseDTO_droneRegistration.setId(newDrone.getId());
+        responseDTO_droneRegistration.setSerialNumber(newDrone.getSerialNumber());
+        responseDTO_droneRegistration.setModel(newDrone.getModel());
+        responseDTO_droneRegistration.setName(newDrone.getName());
+        responseDTO_droneRegistration.setWeightLimit(newDrone.getWeightLimit());
+        responseDTO_droneRegistration.setBatteryCapacity(newDrone.getBatteryCapacity());
+        responseDTO_droneRegistration.setState(newDrone.getState());
+
+        log.info("DroneService::registerDrone execution ended");
+        return responseDTO_droneRegistration;
     }
 
     @Override
     public ResponseDTO_CheckAvailableDronesForLoading checkAvailableDronesForLoading() throws DroneServiceException {
-        try {
-            log.info("DroneService::checkAvailableDronesForLoading execution started.");
+        log.info("DroneService::checkAvailableDronesForLoading execution started.");
 
-            List<Drone> listOfIdleDrones = droneRepository.findAllByState(Constant.IDLE);
+        List<Drone> listOfIdleDrones = droneRepository.findAllByState(Constant.IDLE);
 
-            if (listOfIdleDrones.isEmpty()) {
-                throw new DroneServiceException("NO DRONES ARE AVAILABLE FOR LOADING!");
-            }
-
-            ResponseDTO_CheckAvailableDronesForLoading responseDTO_checkAvailableDronesForLoading = new ResponseDTO_CheckAvailableDronesForLoading();
-            responseDTO_checkAvailableDronesForLoading.setDroneList(listOfIdleDrones);
-
-            log.info("DroneService::checkAvailableDronesForLoading execution ended");
-            return responseDTO_checkAvailableDronesForLoading;
-        } catch (Exception ex) {
-            log.error("DroneService::checkAvailableDronesForLoading exception {}", ex.getMessage());
-            ex.printStackTrace();
+        if (listOfIdleDrones.isEmpty()) {
+            throw new DroneServiceException("NO DRONES ARE AVAILABLE FOR LOADING!");
         }
 
-        log.info("DroneService::checkAvailableDronesForLoading execution ended with null return");
-        return null;
+        ResponseDTO_CheckAvailableDronesForLoading responseDTO_checkAvailableDronesForLoading = new ResponseDTO_CheckAvailableDronesForLoading();
+        responseDTO_checkAvailableDronesForLoading.setDroneList(listOfIdleDrones);
+
+        log.info("DroneService::checkAvailableDronesForLoading execution ended");
+        return responseDTO_checkAvailableDronesForLoading;
     }
 
     @Override
     public ResponseDTO_CheckBatteryLevel checkBatteryLevel(String serialNumber) throws DroneServiceException {
-        try {
-            log.info("DroneService::checkBatteryLevel execution started.");
-            log.debug("DroneService::checkBatteryLevel request parameters {}", serialNumber);
+        log.info("DroneService::checkBatteryLevel execution started.");
+        log.debug("DroneService::checkBatteryLevel request parameters {}", serialNumber);
 
-            Drone drone = droneRepository.findBySerialNumber(serialNumber);
-            if (drone == null) {
-                throw new DroneServiceException("NO EXISTING DRONE FOR SERIAL NUMBER [" + serialNumber + "]");
-            }
-
-            ResponseDTO_CheckBatteryLevel responseDTO_checkBatteryLevel = new ResponseDTO_CheckBatteryLevel();
-            responseDTO_checkBatteryLevel.setSerialNumber(drone.getSerialNumber());
-            responseDTO_checkBatteryLevel.setModel(drone.getModel());
-            responseDTO_checkBatteryLevel.setBatteryCapacity(drone.getBatteryCapacity() + "%");
-
-            log.info("DroneService::checkBatteryLevel execution ended");
-            return responseDTO_checkBatteryLevel;
-        } catch (Exception ex) {
-            log.error("DroneService::checkBatteryLevel exception {}", ex.getMessage());
-            ex.printStackTrace();
+        Drone drone = droneRepository.findBySerialNumber(serialNumber);
+        if (drone == null) {
+            throw new DroneServiceException("NO EXISTING DRONE FOR SERIAL NUMBER [" + serialNumber + "]");
         }
 
-        log.info("DroneService::checkBatteryLevel execution ended with null return");
-        return null;
+        ResponseDTO_CheckBatteryLevel responseDTO_checkBatteryLevel = new ResponseDTO_CheckBatteryLevel();
+        responseDTO_checkBatteryLevel.setSerialNumber(drone.getSerialNumber());
+        responseDTO_checkBatteryLevel.setModel(drone.getModel());
+        responseDTO_checkBatteryLevel.setBatteryCapacity(drone.getBatteryCapacity() + "%");
+
+        log.info("DroneService::checkBatteryLevel execution ended");
+        return responseDTO_checkBatteryLevel;
     }
 }

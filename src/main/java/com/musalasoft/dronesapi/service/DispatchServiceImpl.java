@@ -28,62 +28,57 @@ public class DispatchServiceImpl implements DispatchService {
 
     @Override
     public ResponseDTO_LoadDroneWithMedications loadDroneWithMedications(RequestDTO_LoadDroneWithMedications requestDTO_loadDroneWithMedications) throws DispatchServiceException {
-        try {
-            log.info("DispatchService::loadDroneWithMedications execution started.");
-            log.debug("DispatchService::loadDroneWithMedications request parameters {}", requestDTO_loadDroneWithMedications);
+        log.info("DispatchService::loadDroneWithMedications execution started.");
+        log.debug("DispatchService::loadDroneWithMedications request parameters {}", requestDTO_loadDroneWithMedications);
 
-            // Preload Medications Data
+        // Preload Medications Data
 
-            Drone drone = droneRepository.findBySerialNumber(requestDTO_loadDroneWithMedications.getSerialNumber());
-            Medication medication = medicationRepository.findByCode(requestDTO_loadDroneWithMedications.getCode());
+        Drone drone = droneRepository.findBySerialNumber(requestDTO_loadDroneWithMedications.getSerialNumber());
+        Medication medication = medicationRepository.findByCode(requestDTO_loadDroneWithMedications.getCode());
 
-            double droneBatteryCapacity;
-            if (drone == null) {
-                throw new DispatchServiceException("NO EXISTING DRONE FOR SERIAL NUMBER [" + requestDTO_loadDroneWithMedications.getSerialNumber() + "]");
-            } else {
-                droneBatteryCapacity = drone.getBatteryCapacity();
-            }
+        double droneBatteryCapacity;
+        if (drone == null) {
+            throw new DispatchServiceException("NO EXISTING DRONE FOR SERIAL NUMBER [" + requestDTO_loadDroneWithMedications.getSerialNumber() + "]");
+        } else {
+            droneBatteryCapacity = drone.getBatteryCapacity();
+        }
 
-            if (medication == null) {
-                throw new DispatchServiceException("NO EXISTING MEDICATION FOR CODE [" + requestDTO_loadDroneWithMedications.getCode() + "]");
-            }
+        if (medication == null) {
+            throw new DispatchServiceException("NO EXISTING MEDICATION FOR CODE [" + requestDTO_loadDroneWithMedications.getCode() + "]");
+        }
 
-            boolean existingMedicationInDrone = medicationDeliveryRepository.findByDroneAndMedication(drone, medication) != null;
-            if (existingMedicationInDrone) {
-                throw new DispatchServiceException("DRONE IS ALREADY LOADED WITH THE MEDICATION [" + medication.getCode() + "]");
-            }
+        boolean existingMedicationInDrone = medicationDeliveryRepository.findByDroneAndMedication(drone, medication) != null;
+        if (existingMedicationInDrone) {
+            throw new DispatchServiceException("DRONE IS ALREADY LOADED WITH THE MEDICATION [" + medication.getCode() + "]");
+        }
 
-            boolean isDroneWeightLimitExceeded = isDroneWeightLimitExceeded(drone, medication);
-            boolean isDroneBatteryLow = droneBatteryCapacity < Constant.DRONE_BATTERY_CAPACITY;
+        boolean isDroneWeightLimitExceeded = isDroneWeightLimitExceeded(drone, medication);
+        boolean isDroneBatteryLow = droneBatteryCapacity < Constant.DRONE_BATTERY_CAPACITY;
 
-            if (isDroneBatteryLow) {
-                throw new DispatchServiceException("DRONE'S BATTERY CAPACITY IS LOW");
-            }
+        if (isDroneBatteryLow) {
+            throw new DispatchServiceException("DRONE'S BATTERY CAPACITY IS LOW");
+        }
 
-            if (!isDroneWeightLimitExceeded) {
-                // UPDATING DRONE STATE FROM 'IDLE' TO 'LOADING'
-                droneRepository.updateDroneState(Constant.LOADING, requestDTO_loadDroneWithMedications.getSerialNumber());
+        if (!isDroneWeightLimitExceeded) {
+            // UPDATING DRONE STATE FROM 'IDLE' TO 'LOADING'
+            droneRepository.updateDroneState(Constant.LOADING, requestDTO_loadDroneWithMedications.getSerialNumber());
 
-                MedicationDelivery medicationDelivery = new MedicationDelivery();
-                medicationDelivery.setDrone(drone);
-                medicationDelivery.setMedication(medication);
-                medicationDelivery.setAddedOn(java.time.LocalDateTime.now());
-                MedicationDelivery newMedicationDelivery = medicationDeliveryRepository.save(medicationDelivery);
+            MedicationDelivery medicationDelivery = new MedicationDelivery();
+            medicationDelivery.setDrone(drone);
+            medicationDelivery.setMedication(medication);
+            medicationDelivery.setAddedOn(java.time.LocalDateTime.now());
+            MedicationDelivery newMedicationDelivery = medicationDeliveryRepository.save(medicationDelivery);
 
-                // UPDATING DRONE STATE FROM 'LOADING' TO 'LOADED'
-                droneRepository.updateDroneState(Constant.LOADED, drone.getSerialNumber());
+            // UPDATING DRONE STATE FROM 'LOADING' TO 'LOADED'
+            droneRepository.updateDroneState(Constant.LOADED, drone.getSerialNumber());
 
-                ResponseDTO_LoadDroneWithMedications responseDTO_loadDroneWithMedications = new ResponseDTO_LoadDroneWithMedications();
-                responseDTO_loadDroneWithMedications.setId(newMedicationDelivery.getId());
-                responseDTO_loadDroneWithMedications.setSerialNumber(newMedicationDelivery.getDrone().getSerialNumber());
-                responseDTO_loadDroneWithMedications.setCode(newMedicationDelivery.getMedication().getCode());
+            ResponseDTO_LoadDroneWithMedications responseDTO_loadDroneWithMedications = new ResponseDTO_LoadDroneWithMedications();
+            responseDTO_loadDroneWithMedications.setId(newMedicationDelivery.getId());
+            responseDTO_loadDroneWithMedications.setSerialNumber(newMedicationDelivery.getDrone().getSerialNumber());
+            responseDTO_loadDroneWithMedications.setCode(newMedicationDelivery.getMedication().getCode());
 
-                log.info("DispatchService::loadDroneWithMedications execution ended");
-                return responseDTO_loadDroneWithMedications;
-            }
-        } catch (Exception ex) {
-            log.error("DispatchService::loadDroneWithMedications exception {}", ex.getMessage());
-            ex.printStackTrace();
+            log.info("DispatchService::loadDroneWithMedications execution ended");
+            return responseDTO_loadDroneWithMedications;
         }
 
         log.info("DispatchService::loadDroneWithMedications execution ended with null return");
@@ -92,36 +87,28 @@ public class DispatchServiceImpl implements DispatchService {
 
     @Override
     public ResponseDTO_CheckLoadedMedications checkLoadedMedications(String serialNumber) throws DispatchServiceException {
-        try {
-            log.info("DispatchService::checkLoadedMedications execution started.");
-            log.debug("DispatchService::checkLoadedMedications request parameters {}", serialNumber);
+        log.info("DispatchService::checkLoadedMedications execution started.");
+        log.debug("DispatchService::checkLoadedMedications request parameters {}", serialNumber);
 
-            Drone drone = droneRepository.findBySerialNumber(serialNumber);
-            if (drone == null) {
-                throw new DispatchServiceException("NO EXISTING DRONE FOR SERIAL NUMBER [" + serialNumber + "]");
-            }
-
-            List<MedicationDelivery> alreadyExistingMedicationsInDrone = medicationDeliveryRepository.findAllByDrone(drone);
-
-            if (alreadyExistingMedicationsInDrone.isEmpty()) {
-                throw new DispatchServiceException("NO MEDICATION ARE LOADED ON DRONE [" + serialNumber + "]");
-            }
-
-            List<Medication> medicationList = alreadyExistingMedicationsInDrone.stream().map(MedicationDelivery::getMedication).collect(Collectors.toList());
-
-            ResponseDTO_CheckLoadedMedications responseDTO_checkLoadedMedications = new ResponseDTO_CheckLoadedMedications();
-            responseDTO_checkLoadedMedications.setSerialNumber(drone.getSerialNumber());
-            responseDTO_checkLoadedMedications.setMedicationList(medicationList);
-
-            log.info("DispatchService::checkLoadedMedications execution ended");
-            return responseDTO_checkLoadedMedications;
-        } catch (Exception ex) {
-            log.error("DispatchService::checkLoadedMedications exception {}", ex.getMessage());
-            ex.printStackTrace();
+        Drone drone = droneRepository.findBySerialNumber(serialNumber);
+        if (drone == null) {
+            throw new DispatchServiceException("NO EXISTING DRONE FOR SERIAL NUMBER [" + serialNumber + "]");
         }
 
-        log.info("DispatchService::checkLoadedMedications execution ended with null return");
-        return null;
+        List<MedicationDelivery> alreadyExistingMedicationsInDrone = medicationDeliveryRepository.findAllByDrone(drone);
+
+        if (alreadyExistingMedicationsInDrone.isEmpty()) {
+            throw new DispatchServiceException("NO MEDICATION ARE LOADED ON DRONE [" + serialNumber + "]");
+        }
+
+        List<Medication> medicationList = alreadyExistingMedicationsInDrone.stream().map(MedicationDelivery::getMedication).collect(Collectors.toList());
+
+        ResponseDTO_CheckLoadedMedications responseDTO_checkLoadedMedications = new ResponseDTO_CheckLoadedMedications();
+        responseDTO_checkLoadedMedications.setSerialNumber(drone.getSerialNumber());
+        responseDTO_checkLoadedMedications.setMedicationList(medicationList);
+
+        log.info("DispatchService::checkLoadedMedications execution ended");
+        return responseDTO_checkLoadedMedications;
     }
 
     public boolean isDroneWeightLimitExceeded(Drone drone, Medication loadedMedication) throws DispatchServiceException {

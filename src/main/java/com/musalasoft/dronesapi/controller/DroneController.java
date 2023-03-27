@@ -32,7 +32,7 @@ public class DroneController {
      */
     @PostMapping(path = "/register", consumes = "application/json", produces = "application/json")
     public ResponseEntity<APIResponse> registerDrone(
-            @Valid @NotNull @RequestBody RequestDTO_DroneRegistration requestDTO_droneRegistration) {
+            @Valid @NotNull @RequestBody RequestDTO_DroneRegistration requestDTO_droneRegistration) throws DroneServiceException{
         log.info("DroneController::registerDrone request body {}", requestDTO_droneRegistration);
 
         ResponseDTO_DroneRegistration responseDTO_droneRegistration = droneService.registerDrone(requestDTO_droneRegistration);
